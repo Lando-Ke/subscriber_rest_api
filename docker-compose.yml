@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: "mysql:8.0"
+    container_name: "rest-api-mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "rest_api"
+      MYSQL_DATABASE: "rest_api"
+      MYSQL_USER: "rest_api"
+      MYSQL_PASSWORD: "rest_api"
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./subscribers.sql:/docker-entrypoint-initdb.d/subscribers.sql  # Mount the SQL file
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+volumes:
+  db_data:
